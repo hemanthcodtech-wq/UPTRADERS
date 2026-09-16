@@ -480,4 +480,17 @@ router.get('/settings/announcement', async (req, res) => {
   }
 });
 
+// GET /api/general/schedule-timings — public, returns only enabled slots
+router.get('/schedule-timings', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT value FROM settings WHERE key=$1', ['schedule_timings']);
+    const all = result.rows[0]?.value || [];
+    const enabled = all.filter(s => s.enabled !== false);
+    res.json({ slots: enabled });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
+

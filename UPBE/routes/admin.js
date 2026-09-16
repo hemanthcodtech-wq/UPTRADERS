@@ -1289,5 +1289,33 @@ router.post('/orders/:id/assign-delivery', authMiddleware, adminOnly, async (req
   }
 });
 
+// GET /api/admin/settings/schedule-timings
+router.get('/settings/schedule-timings', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT value FROM settings WHERE key=$1', ['schedule_timings']);
+    const slots = result.rows[0]?.value;
+    res.json({ slots: slots || [] });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// POST /api/admin/settings/schedule-timings
+router.post('/settings/schedule-timings', authMiddleware, adminOnly, async (req, res) => {
+  const { slots } = req.body;
+  if (!Array.isArray(slots)) return res.status(400).json({ error: 'slots must be an array' });
+  try {
+    const value = JSON.stringify(slots);
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('schedule_timings', $1) ON CONFLICT (key) DO UPDATE SET value=$1, updated_at=NOW()`,
+      [value]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
+
 
