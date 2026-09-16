@@ -50,10 +50,10 @@ const sections = [
     badge: 'Gift-Ready',
     badgeColor: 'bg-amber-100 text-amber-700',
     content: [
-      'Every UP Traders order is packed in premium, branded packaging designed to protect your jewelry during transit.',
-      'Our packaging is eco-friendly and gift-ready — perfect for gifting a loved one right out of the box.',
-      'We use extra cushioning for delicate pieces to ensure they arrive in perfect condition.',
-      'A beautiful thank-you card is included with every order.',
+      'Every UP Traders order is carefully packed to ensure your groceries and products arrive fresh and in perfect condition.',
+      'We use secure, food-safe packaging materials to prevent damage during transit.',
+      'Perishable and fragile items receive extra protective packaging.',
+      'A thank-you note is included with every order.',
     ],
   },
   {

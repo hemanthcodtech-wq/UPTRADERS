@@ -228,8 +228,8 @@ function RazorpayPaymentForm({ isPlacingOrder, handlePlaceOrder, termsAccepted, 
         <ul className="space-y-1.5 text-xs text-blue-700 leading-relaxed">
           <li className="flex items-start gap-2"><span className="shrink-0">•</span><span>Shipping typically takes <strong>1–3 business days</strong> depending on your location.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">•</span><span>If your package arrives damaged or has missing items, <strong>photo proof is required</strong> and must be reported within <strong>1–2 business days</strong> of delivery to . No claims will be accepted without proof.</span></li>
-          <li className="flex items-start gap-2"><span className="shrink-0">•</span><span>All sales are <strong>final — no returns or exchanges</strong>. Items are fashion jewellery and sold as-is.</span></li>
-          <li className="flex items-start gap-2"><span className="shrink-0">•</span><span>To keep your jewellery looking its best: avoid contact with water, perfume, and harsh chemicals. Store in a dry place when not in use.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">•</span><span>All sales are <strong>final — no returns or exchanges</strong> unless the item is damaged or missing. Items are sold as-is.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">•</span><span>For fresh and perishable items: please store immediately upon receipt as instructed on the packaging to maintain quality.</span></li>
         </ul>
       </div>
 
@@ -304,6 +304,8 @@ export function CheckoutPage() {
   const [pickupTermsAccepted, setPickupTermsAccepted] = useState(false);
   const [sessionSecondsLeft, setSessionSecondsLeft] = useState(null);
   const sessionTimerRef = useRef(null);
+  const [scheduledTime, setScheduledTime] = useState('');
+  const [scheduleSlots, setScheduleSlots] = useState([]);
 
 
   useEffect(() => {
@@ -312,6 +314,14 @@ export function CheckoutPage() {
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Fetch enabled schedule slots for checkout
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/general/schedule-timings`)
+      .then(r => r.json())
+      .then(d => { if (d.slots) setScheduleSlots(d.slots); })
+      .catch(() => {});
   }, []);
 
   // Redirect unauthenticated users to login
@@ -528,10 +538,13 @@ export function CheckoutPage() {
     const endpoint = token ? `${BACKEND_URL}/auth/orders` : `${BACKEND_URL}/general/orders`;
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
+    const orderAddress = (orderType === 'pickup')
+      ? { name: pickupContact.name, mobile: `${COUNTRIES.find(c=>c.code===pickupDialCode)?.dial||'+1'}${pickupContact.phone}`, email: pickupContact.email }
+      : { ...address, ...(scheduledTime ? { scheduled_time: scheduledTime } : {}) };
     const res = await fetch(endpoint, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ items, address: (orderType === 'pickup') ? { name: pickupContact.name, mobile: `${COUNTRIES.find(c=>c.code===pickupDialCode)?.dial||'+1'}${pickupContact.phone}`, email: pickupContact.email } : address, total: finalTotal, coupon_code: couponCode, payment_method: pMethod, order_type: orderType, razorpay_order_id: razorpayOrderId, razorpay_payment_id: razorpayPaymentId, razorpay_signature: razorpaySignature, discount_amount: discount, shipping_fee: shippingFee, tax_amount: taxAmount, m_coins_used: coinsDiscount })
+      body: JSON.stringify({ items, address: orderAddress, total: finalTotal, coupon_code: couponCode, payment_method: pMethod, order_type: orderType, razorpay_order_id: razorpayOrderId, razorpay_payment_id: razorpayPaymentId, razorpay_signature: razorpaySignature, discount_amount: discount, shipping_fee: shippingFee, tax_amount: taxAmount, m_coins_used: coinsDiscount })
     });
     return res.json();
   };
@@ -551,6 +564,11 @@ export function CheckoutPage() {
         errs.mobile = `Enter a valid 10-digit number`;
       } else if (!['US', 'CA', 'IN'].includes(dialCountryCode) && (mobileDigits.length < 5 || mobileDigits.length > 15)) {
         errs.mobile = 'Enter a valid phone number';
+      }
+      // Schedule time validation — only if slots exist
+      if (scheduleSlots.length > 0 && !scheduledTime) {
+        showToast('Please select a preferred delivery time slot.', 'error');
+        return;
       }
       if (Object.keys(errs).length > 0) {
         setFieldErrors(errs);
@@ -1242,6 +1260,34 @@ export function CheckoutPage() {
                 )}
               </div>
 
+              {/* ── Schedule Delivery Time (new address form) ── */}
+              {scheduleSlots.length > 0 && orderType !== 'pickup' && (
+                <div className="px-4 pt-2 pb-2 sm:px-6">
+                  <div className="bg-[#FDF8F0] border border-brand-green/20 rounded-2xl p-4 space-y-3">
+                    <p className="text-xs font-bold text-gray-900 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      Preferred Delivery Time <span className="text-red-500">*</span>
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {scheduleSlots.map((slot, i) => (
+                        <label key={i} className={`flex items-center gap-3 cursor-pointer rounded-xl border-2 px-4 py-3 transition-all ${
+                          scheduledTime === slot.label
+                            ? 'border-brand-green bg-brand-green/5'
+                            : 'border-gray-200 bg-white hover:border-brand-green/40'
+                        }`}>
+                          <input type="radio" name="schedule-time-new" value={slot.label}
+                            checked={scheduledTime === slot.label}
+                            onChange={() => setScheduledTime(slot.label)}
+                            className="accent-brand-green w-4 h-4 shrink-0" />
+                          <span className={`text-sm font-bold ${scheduledTime === slot.label ? 'text-brand-green' : 'text-gray-700'}`}>{slot.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {!scheduledTime && <p className="text-[11px] text-amber-600 font-medium">Please pick a delivery time slot to continue.</p>}
+                  </div>
+                </div>
+              )}
+
               {/* Proceed button inside card on mobile */}
               <div className="px-4 pb-4 sm:px-6 sm:pb-6">
                 <button onClick={handleProceedToPayment}
@@ -1259,6 +1305,32 @@ export function CheckoutPage() {
             {/* Proceed button when using saved address */}
             {!showNewAddressForm && addresses.length > 0 && (
               <div className="space-y-3">
+                {/* ── Schedule Delivery Time (saved address) ── */}
+                {scheduleSlots.length > 0 && orderType !== 'pickup' && (
+                  <div className="bg-[#FDF8F0] border border-brand-green/20 rounded-2xl p-4 space-y-3">
+                    <p className="text-xs font-bold text-gray-900 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      Preferred Delivery Time <span className="text-red-500">*</span>
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {scheduleSlots.map((slot, i) => (
+                        <label key={i} className={`flex items-center gap-3 cursor-pointer rounded-xl border-2 px-4 py-3 transition-all ${
+                          scheduledTime === slot.label
+                            ? 'border-brand-green bg-brand-green/5'
+                            : 'border-gray-200 bg-white hover:border-brand-green/40'
+                        }`}>
+                          <input type="radio" name="schedule-time-saved" value={slot.label}
+                            checked={scheduledTime === slot.label}
+                            onChange={() => setScheduledTime(slot.label)}
+                            className="accent-brand-green w-4 h-4 shrink-0" />
+                          <span className={`text-sm font-bold ${scheduledTime === slot.label ? 'text-brand-green' : 'text-gray-700'}`}>{slot.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {!scheduledTime && <p className="text-[11px] text-amber-600 font-medium">Please pick a delivery time slot to continue.</p>}
+                  </div>
+                )}
+
                 <button onClick={handleProceedToPayment}
                   className="w-full bg-brand-green text-white font-bold text-sm rounded-xl py-4 shadow-lg hover:shadow-xl hover:bg-brand-green/90 transition-all flex items-center justify-center gap-2">
                   <CreditCard className="w-4 h-4" /> Proceed to Payment

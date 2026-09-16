@@ -178,6 +178,14 @@ const updateStatus = async (orderId, status) => {
                           <span className="text-[10px] font-bold text-gray-900/40 uppercase tracking-wider w-14 shrink-0 mt-0.5">Payment</span>
                           <span className="text-sm font-semibold text-gray-900 capitalize">{order.payment_method === 'razorpay' ? 'Online (Razorpay)' : order.payment_method || '—'}</span>
                         </div>
+                        {address.scheduled_time && (
+                          <div className="flex items-center gap-2 sm:col-span-2">
+                            <span className="text-[10px] font-bold text-gray-900/40 uppercase tracking-wider w-14 shrink-0">Schedule</span>
+                            <span className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs px-3 py-1 rounded-full">
+                              🕐 {address.scheduled_time}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 

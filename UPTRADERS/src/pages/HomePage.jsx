@@ -10,6 +10,7 @@ import { useGSAP } from '@gsap/react';
 
 import imgHeroBanner from '../assets/hero_banner.png';
 import bannerJewelry from '../assets/banner_jewelry.jpg';
+import allProductsBanner from '../assets/all_products_banner.jpg';
 import imgMeditation from '../assets/story_meditation.png';
 import imgAarti from '../assets/story_aarti.png';
 
@@ -225,28 +226,26 @@ export function HomePage() {
     <div ref={container} className="bg-brand-beige flex-grow w-full flex flex-col pb-8">
       <Header variant="home" />
 
-      {/* Mobile Top Section */}
-      <div className="md:hidden bg-brand-beige pt-[140px] pb-12 px-4 relative flex flex-col items-center">
+      {/* ── Unified Responsive Banner (same image on all screen sizes) ── */}
+      <div className="md:hidden bg-brand-beige pt-[140px] pb-12 px-4">
+        {/* Mobile banner */}
         {banners.length > 0 ? (
-          <div className="relative w-full h-[180px] rounded-[20px] overflow-hidden shadow-xl bg-gradient-to-br from-[#106935] to-emerald-900">
+          <div className="relative w-full h-[180px] rounded-[20px] overflow-hidden shadow-xl">
             <div
               className="flex h-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
               {banners.map((banner) => (
                 <div key={banner.id} className="relative w-full h-full shrink-0">
-                  <div className="absolute inset-0 flex flex-col justify-center px-6 z-10 w-[65%]">
-                    <h2 className="text-white text-xl font-serif font-bold leading-tight mb-3 drop-shadow-md">
-                      {banner.title}
-                    </h2>
-                    {(banner.link_url || banner.link_url === '') && (
-                      <Link to={banner.link_url || "/category/all"} className="bg-[#F29D38] text-white text-[10px] font-extrabold px-5 py-2 rounded-lg w-fit shadow-md">
+                  <img src={banner.image_url} alt={banner.title} className="absolute inset-0 w-full h-full object-cover object-center" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+                  <div className="absolute inset-y-0 left-0 flex flex-col justify-center px-6 z-10" style={{ width: '65%' }}>
+                    <h2 className="text-white text-xl font-serif font-bold leading-tight mb-3 drop-shadow-md">{banner.title}</h2>
+                    {banner.link_url != null && (
+                      <Link to={banner.link_url || '/category/all'} className="bg-[#F29D38] text-white text-[10px] font-extrabold px-5 py-2 rounded-lg w-fit shadow-md">
                         Shop Now
                       </Link>
                     )}
-                  </div>
-                  <div className="absolute right-0 bottom-0 h-full w-[60%] z-0">
-                     <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover object-left" style={{ WebkitMaskImage: 'linear-gradient(to left, black 40%, transparent)', maskImage: 'linear-gradient(to left, black 40%, transparent)' }} />
                   </div>
                 </div>
               ))}
@@ -254,30 +253,25 @@ export function HomePage() {
             {banners.length > 1 && (
               <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
                 {banners.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentSlide(i)}
-                    className={`h-1.5 rounded-full transition-all ${i === currentSlide ? 'bg-white w-4' : 'bg-white/50 w-1.5 hover:bg-white/80'}`}
-                  />
+                  <button key={i} onClick={() => setCurrentSlide(i)}
+                    className={`h-1.5 rounded-full transition-all ${i === currentSlide ? 'bg-white w-4' : 'bg-white/50 w-1.5'}`} />
                 ))}
               </div>
             )}
           </div>
         ) : (
-          <div className="relative w-full h-[180px] rounded-[20px] overflow-hidden shadow-xl bg-gradient-to-br from-[#106935] to-emerald-900">
-            <div className="absolute inset-0 flex flex-col justify-center px-6 z-10 w-[65%]">
-              <h2 className="text-white text-2xl font-serif font-bold leading-tight mb-1.5 drop-shadow-md">
-                Premium Grains &<br />Spices
+          /* Mobile fallback — same allProductsBanner image */
+          <div className="relative w-full h-[180px] rounded-[20px] overflow-hidden shadow-xl">
+            <img src={allProductsBanner} alt="Premium Grains and Spices" className="absolute inset-0 w-full h-full object-cover object-center" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#106935]/90 via-[#106935]/60 to-transparent" />
+            <div className="absolute inset-y-0 left-0 flex flex-col justify-center px-6 z-10" style={{ width: '65%' }}>
+              <h2 className="text-white text-xl font-serif font-bold leading-tight mb-1.5 drop-shadow-md">
+                Premium Grains<br />& Spices
               </h2>
-              <p className="text-[#F29D38] text-[11px] font-semibold mb-4 opacity-90 tracking-wide">
-                Delivered Daily
-              </p>
+              <p className="text-[#F29D38] text-[11px] font-semibold mb-3 opacity-90 tracking-wide">Delivered Daily</p>
               <Link to="/category/all" className="bg-[#F29D38] text-white text-[10px] font-extrabold px-5 py-2 rounded-lg w-fit shadow-md hover:bg-white hover:text-[#106935] transition-colors">
                 Shop Now
               </Link>
-            </div>
-            <div className="absolute right-0 bottom-0 h-full w-[50%] z-0">
-               <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=500&auto=format&fit=crop" alt="Spices" className="w-full h-full object-cover object-left opacity-90" style={{ WebkitMaskImage: 'linear-gradient(to left, black 40%, transparent)', maskImage: 'linear-gradient(to left, black 40%, transparent)' }} />
             </div>
           </div>
         )}
@@ -324,17 +318,25 @@ export function HomePage() {
           </div>
         ) : (
           <div className="flex justify-center px-4 md:px-24 pt-2 md:pt-6 pb-2">
-            <div className="relative w-full h-72 md:h-[360px] rounded-[24px] overflow-hidden shadow-2xl border border-[#106935]/10 bg-brand-beige group">
-              <div className="absolute inset-0 z-0">
-                <img src="https://images.unsplash.com/photo-1615486171448-472e391cb09c?auto=format&fit=crop&w=1600&q=80" alt="Premium Grains and Spices" className="w-full h-full object-cover object-right transition-transform duration-1000 group-hover:scale-105 opacity-90" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#FDF8F0] via-[#FDF8F0]/95 to-[#FDF8F0]/0 z-10 pointer-events-none w-full md:w-[80%]"></div>
-              </div>
+            <div className="relative w-full h-72 md:h-[360px] rounded-[24px] overflow-hidden shadow-2xl border border-[#106935]/10 bg-[#FDF8F0] group">
 
-              {/* Content */}
-              <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-12 z-10 w-[70%]">
-                <h2 className="text-[#106935] text-2xl md:text-4xl lg:text-[40px] font-bold mb-3 md:mb-4 leading-[1.2] font-serif tracking-wide drop-shadow-sm">
+              {/* Full-width background image using local asset */}
+              <img
+                src={allProductsBanner}
+                alt="Premium Grains and Spices"
+                className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-105"
+              />
+
+              {/* Left gradient overlay — covers 60% so image shows on right */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FDF8F0] via-[#FDF8F0]/95 to-transparent pointer-events-none"
+                style={{ width: '65%' }} />
+
+              {/* Text content — left side */}
+              <div className="absolute inset-y-0 left-0 flex flex-col justify-center px-8 md:px-12 z-10"
+                style={{ width: '55%' }}>
+                <h2 className="text-[#106935] text-2xl md:text-4xl lg:text-[40px] font-bold mb-3 md:mb-4 leading-[1.2] font-serif tracking-wide">
                   Premium Quality,<br />
-<span className="text-[#F29D38] font-semibold">Delivered Daily</span>
+                  <span className="text-[#F29D38] font-semibold">Delivered Daily</span>
                 </h2>
                 <p className="text-gray-600 text-xs md:text-sm lg:text-[15px] mb-6 md:mb-8 max-w-[280px] md:max-w-sm leading-relaxed">
                   Shop the finest selection of farm-fresh grains, pulses, oils, and aromatic spices.

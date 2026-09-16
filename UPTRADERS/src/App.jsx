@@ -47,6 +47,7 @@ import { AdminPickupOrdersPage } from './pages/admin/AdminPickupOrdersPage';
 import { AdminDirectOrdersPage } from './pages/admin/AdminDirectOrdersPage';
 import { AdminReviewsPage } from './pages/admin/AdminReviewsPage';
 import { AdminVacationPage } from './pages/admin/AdminVacationPage';
+import { AdminScheduleTimingsPage } from './pages/admin/AdminScheduleTimingsPage';
 import { PickupPage } from './pages/PickupPage';
 import { SearchPage } from './pages/SearchPage';
 
@@ -89,6 +90,7 @@ function App() {
                   <Route path="direct-orders" element={<AdminDirectOrdersPage />} />
                   <Route path="reviews" element={<AdminReviewsPage />} />
                   <Route path="vacation" element={<AdminVacationPage />} />
+                  <Route path="schedule-timings" element={<AdminScheduleTimingsPage />} />
                   <Route path="banners" element={<AdminBannersPage />} />
                   <Route path="/coupons" element={<AdminCouponsPage />} />
                   <Route path="/reports" element={<AdminReportsPage />} />

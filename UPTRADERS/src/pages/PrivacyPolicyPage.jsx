@@ -28,7 +28,8 @@ export function PrivacyPolicyPage() {
 
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 mt-10 mb-4">1. Who We Are</h2>
           <p>
-            UP Traders is a U.S.-based jewelry business that sells fashion jewelry through its online store and other sales channels.
+            UP Traders is an India-based grocery store that sells fresh produce, grains, grocery items, and related products through its online store and other sales channels.
+
           </p>
           <p>
             For privacy-related questions or requests, please contact us using the information provided in the Contact Us section of this Privacy Policy.

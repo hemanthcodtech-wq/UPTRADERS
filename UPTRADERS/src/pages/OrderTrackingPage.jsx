@@ -109,7 +109,7 @@ export function OrderTrackingPage() {
                   {order?.order_type === 'pickup' ? 'Pickup Status' : 'Est. Shipping'}
                 </p>
                 <p className="text-sm font-semibold text-gray-900">
-                  {order?.order_type === 'pickup' ? 'We will contact you' : 'Within 1-3 Business Days'}
+                  {order?.order_type === 'pickup' ? 'We will contact you' : 'Within your selected time slot'}
                 </p>
               </div>
             </div>

@@ -19,7 +19,7 @@ export function TermsOfServicePage() {
           <p>If you do not agree with these Terms, please do not use our website or place an order.</p>
 
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 mt-10 mb-4">1. About UP Traders</h2>
-          <p>UP Traders (“UP Traders,” “we,” “us,” or “our”) operates an online jewelry business offering fashion jewelry and related products.</p>
+          <p>UP Traders ("UP Traders," "we," "us," or "our") operates an online grocery store offering fresh produce, grains, grocery items, and related products.</p>
           <p>These Terms apply to all purchases and transactions made through our website unless otherwise stated.</p>
 
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 mt-10 mb-4">2. Eligibility</h2>
