@@ -106,7 +106,7 @@ router.post('/signup', async (req, res) => {
     res.json({ message: 'Email OTP sent' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: err.message });
   }
 });
 
