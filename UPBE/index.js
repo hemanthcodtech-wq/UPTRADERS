@@ -10,6 +10,7 @@ const allowedOrigins = [
   'https://uptradershi.vercel.app',
   'https://uptradershi.vercel.app',
   'https://upraders.in',
+  'https://www.upraders.in',
   
   process.env.FRONTEND_URL
 ].filter(Boolean);
