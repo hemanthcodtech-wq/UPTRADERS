@@ -8,9 +8,8 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'http://localhost:5173',
   'https://uptradershi.vercel.app',
-  'https://uptradershi.vercel.app',
-  'https://upraders.in',
-  'https://www.upraders.in',
+  'https://uptraders.in',
+  'https://www.uptraders.in',
   
   process.env.FRONTEND_URL
 ].filter(Boolean);
