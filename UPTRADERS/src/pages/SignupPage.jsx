@@ -79,22 +79,38 @@ function RoleCard({ role, selected, onSelect, mobile = false }) {
 
 // ── OTP Input Row ─────────────────────────────────────────────────────────────
 function OtpRow({ otp, setOtp, refs, mobile = false }) {
-  const handleChange = (val, idx) => {
-    if (!/^\d?$/.test(val)) return;
-    const next = [...otp]; next[idx] = val; setOtp(next);
-    if (val && idx < 5) refs.current[idx + 1]?.focus();
+  const handleChange = (e, idx) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (!val && e.target.value) return; // Ignore non-digits
+    
+    // If it's more than 1 character (e.g. from Android keyboard autocomplete)
+    if (val.length > 1) {
+      val = val.slice(-1); // Take just the last entered digit
+    }
+    
+    const next = [...otp];
+    next[idx] = val;
+    setOtp(next);
+    
+    if (val && idx < 5) {
+      setTimeout(() => refs.current[idx + 1]?.focus(), 10);
+    }
   };
+  
   const handleKeyDown = (e, idx) => {
-    if (e.key === 'Backspace' && !otp[idx] && idx > 0) refs.current[idx - 1]?.focus();
+    if (e.key === 'Backspace' && !otp[idx] && idx > 0) {
+      setTimeout(() => refs.current[idx - 1]?.focus(), 10);
+    }
   };
+
   return (
     <div className="flex justify-center gap-2.5">
       {otp.map((digit, idx) => (
         <input
           key={idx}
           ref={el => refs.current[idx] = el}
-          type="text" inputMode="numeric" maxLength={1} value={digit}
-          onChange={e => handleChange(e.target.value, idx)}
+          type="text" inputMode="numeric" value={digit}
+          onChange={e => handleChange(e, idx)}
           onKeyDown={e => handleKeyDown(e, idx)}
           onPaste={e => {
             e.preventDefault();
@@ -106,7 +122,7 @@ function OtpRow({ otp, setOtp, refs, mobile = false }) {
             });
             setOtp(next);
             const nextFocusIndex = Math.min(pastedData.length, 5);
-            refs.current[nextFocusIndex]?.focus();
+            setTimeout(() => refs.current[nextFocusIndex]?.focus(), 10);
           }}
           className={`${mobile ? 'w-12 h-14' : 'w-11 h-13'} text-center text-2xl font-bold rounded-xl border-2 bg-white text-gray-900 focus:outline-none focus:border-[#106935] focus:ring-4 focus:ring-[#106935]/10 transition-all duration-200 border-gray-200 hover:border-gray-300 shadow-sm`}
         />
@@ -535,14 +551,15 @@ export function SignupPage() {
                 <input
                   key={idx}
                   ref={el => otpRefs.current[idx] = el}
-                  type="text" inputMode="numeric" maxLength={1} value={digit}
+                  type="text" inputMode="numeric" value={digit}
                   onChange={e => {
-                    const val = e.target.value;
-                    if (!/^\d?$/.test(val)) return;
+                    let val = e.target.value.replace(/\D/g, '');
+                    if (!val && e.target.value) return;
+                    if (val.length > 1) val = val.slice(-1);
                     const next = [...otp]; next[idx] = val; setOtp(next);
-                    if (val && idx < 5) otpRefs.current[idx + 1]?.focus();
+                    if (val && idx < 5) setTimeout(() => otpRefs.current[idx + 1]?.focus(), 10);
                   }}
-                  onKeyDown={e => { if (e.key === 'Backspace' && !otp[idx] && idx > 0) otpRefs.current[idx - 1]?.focus(); }}
+                  onKeyDown={e => { if (e.key === 'Backspace' && !otp[idx] && idx > 0) setTimeout(() => otpRefs.current[idx - 1]?.focus(), 10); }}
                   onPaste={e => {
                     e.preventDefault();
                     const pastedData = e.clipboardData.getData('text/plain').replace(/\D/g, '').slice(0, 6);
@@ -553,7 +570,7 @@ export function SignupPage() {
                     });
                     setOtp(next);
                     const nextFocusIndex = Math.min(pastedData.length, 5);
-                    otpRefs.current[nextFocusIndex]?.focus();
+                    setTimeout(() => otpRefs.current[nextFocusIndex]?.focus(), 10);
                   }}
                   className="w-12 h-14 text-center text-2xl font-bold rounded-2xl border-2 bg-white text-gray-900 focus:outline-none focus:border-[#106935] focus:ring-4 focus:ring-[#106935]/10 border-gray-200 shadow-sm transition-all caret-transparent"
                 />
